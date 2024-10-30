@@ -10,8 +10,8 @@
 # General
 --------------------------------------------------------------*/
 body {
-  zoom: 1.4; /* Primary method */
-  -moz-transform: scale(1.4); /* Fallback for Firefox */
+  zoom: 1.3; /* Primary method */
+  -moz-transform: scale(1.3); /* Fallback for Firefox */
   -moz-transform-origin: center top; /* Keep centered */
   font-family: "Open Sans", sans-serif;
   color: #272829;
