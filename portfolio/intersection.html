@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>MATLAB Intersection exercise</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<!-- Fonts-->
+		<link rel="stylesheet" type="text/css" href="assets/fonts/fontawesome/font-awesome.min.css">
+		<link rel="stylesheet" type="text/css" href="assets/fonts/pe-icon/pe-icon.css">
+		<!-- Vendors-->
+		<link rel="stylesheet" type="text/css" href="assets/vendors/bootstrap/grid.css">
+		<link rel="stylesheet" type="text/css" href="assets/vendors/magnific-popup/magnific-popup.min.css">
+		<link rel="stylesheet" type="text/css" href="assets/vendors/swiper/swiper.css">
+		<!-- App & fonts-->
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700|Open+Sans:400,700">
+		<link rel="stylesheet" type="text/css" id="app-stylesheet" href="assets/css/main.css"><!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+	
+	<body>
+		<div class="page-wrap" id="root">
+			<header class="header header--fixed">
+				<div class="header__inner">
+					<style>
+						.header__logo {
+							display: flex;
+							align-items: center;
+						}
+						.header__logo a {
+							color: black;
+							text-decoration: none;
+							display: flex;
+							align-items: center;
+						}
+					</style>
+					<div class="header__logo">
+						<a href="index.html">
+							<img src="assets/img/portfolio.png" alt="" style="width: 25px; margin-right: 5px;"/>
+							Back to Portfolios
+						</a>
+					</div>
+					<div class="navbar-toggle" id="fs-button">
+						<a href="https://pages.mtu.edu/~amahaur/" class="home-icon">
+							<img src="https://pages.mtu.edu/~amahaur/portfolio/assets/img/home.png" alt="Home Icon" style="width: 24px; height: 24px;" />
+						</a>
+					</div>
+				</div>
+			</header>
+
+			<div class="wil-content">
+				<section class="awe-section">
+					<div class="container">
+						<div class="page-title pb-40">
+							<h2 class="page-title__title">MATLAB Intersection exercise</h2>
+							<strong>Purpose</strong>: Photogrammetry and UAV Mapping Assignment</br>
+							<strong>Semester</strong>: 1st (Fall)</br>
+							<strong>Project date</strong>: 30 October 2023</br>
+							<strong>Skills</strong>: MATLAB Programming, Photogrammetry, Intersection, Aerotriangulation</br>
+							<div class="page-title__divider"></div>
+						</div>
+					</div>
+				</section>
+
+				<section class="awe-section bg-gray">
+					<div class="container">
+						<div>
+							<div class="work-detail__entry">
+								<p><h5>Objective:</h5> The objective of this code is to refine the 3D coordinates of points using camera calibration parameters and exterior orientation (EO) parameters through a nonlinear optimization approach.
+								</br>
+									<h5>Methodology:</h5> The code reads 2D point data from 'intersection_pt.txt', sets up camera calibration and initial EO parameters, computes projection matrices, and iteratively refines 3D coordinates using the Gauss-Newton method. This involves computing reprojection errors and updating the coordinates until convergence or a maximum number of iterations is reached.
+								</br>
+									<h5>Results:</h5> The final refined 3D coordinates for each point are displayed, showing successful convergence for all points with minimal reprojection error changes.</p>
+								
+								<div class="work-images-container">
+									<div class="work-img"><img src="assets/img/intersection2.jpg" alt=""></div>
+									<div class="work-img"><img src="assets/img/intersection3.jpg" alt=""></div>
+									<div class="work-img"><img src="assets/img/intersection4.jpg" alt=""></div>
+								</div>
+<style>.work-images-container {
+    display: flex;
+}
+
+.work-img {
+    margin-right: 10px; /* Optional: Adjust the margin between images */
+}
+
+.work-img:last-child {
+    margin-right: 0; /* Remove the right margin from the last image */
+}
+</style>								
+								
+<h5>MATLAB code</h5>
+<b></br><ul>The code starts by clearing the command window (clc), clearing all variables (clear all), setting the format to long (format long), and defining some initial parameters.
+</br>It reads data from a file named 'intersection_pt.txt' using the readmatrix function.
+</br>The camera calibration parameters (focal length, image width, and height) are set, and initial exterior orientation (EO) parameters for two cameras (EO1 and EO2) are provided.</ul>
+</b><pre class="codeinput">clc;
+clear all;
+format long;
+f0_mm=3.61;  <span class="comment">%mm</span>
+f0_px=3.61/6.16*4000; <span class="comment">%pixel</span>
+data=readmatrix(<span class="string">'intersection_pt.txt'</span>);
+
+focal=f0_px; <span class="comment">% update</span>
+W=4000;
+H=3000;
+
+pt_id=data(:,1);
+x1=data(:,2)-W/2;
+y1=H/2-data(:,3);
+x2=data(:,4)-W/2;
+y2=H/2-data(:,5);
+
+[m,n]=size(data);
+
+EO1= [333121.67;3102935.88;67.45;-0.09*pi/180;-14.58*pi/180;-87.24*pi/180]; <span class="comment">%EO1</span>
+EO2= [333143.66;3102930.81;64.39;3.67*pi/180;-16.84*pi/180;-85.88*pi/180]; <span class="comment">%EO2</span>
+
+XL1=EO1(1,1);
+YL1=EO1(2,1);
+ZL1=EO1(3,1);
+o1=EO1(4,1);
+p1=EO1(5,1);
+k1=EO1(6,1);
+XL2=EO2(1,1);
+YL2=EO2(2,1);
+ZL2=EO2(3,1);
+o2=EO2(4,1);
+p2=EO2(5,1);
+k2=EO2(6,1);
+</pre>
+<b>Matrices M1 and M2 are computed based on the EO parameters for the two cameras. These matrices represent the projection from the 3D world coordinates to 2D image coordinates.</b>
+<pre class="codeinput">M1=[cos(p1)*cos(k1) cos(o1)*sin(k1)+sin(o1)*sin(p1)*cos(k1) sin(o1)*sin(k1)-cos(o1)*sin(p1)*cos(k1);
+       -cos(p1)*sin(k1) cos(o1)*cos(k1)-sin(o1)*sin(p1)*sin(k1) sin(o1)*cos(k1)+cos(o1)*sin(p1)*sin(k1);
+        sin(p1) -sin(o1)*cos(p1) cos(o1)*cos(p1)];
+
+M2=[cos(p2)*cos(k2) cos(o2)*sin(k2)+sin(o2)*sin(p2)*cos(k2) sin(o2)*sin(k2)-cos(o2)*sin(p2)*cos(k2);
+       -cos(p2)*sin(k2) cos(o2)*cos(k2)-sin(o2)*sin(p2)*sin(k2) sin(o2)*cos(k2)+cos(o2)*sin(p2)*sin(k2);
+        sin(p2) -sin(o2)*cos(p2) cos(o2)*cos(p2)];
+</pre>
+</br><b>The code initializes some variables and sets up an initial approximation of the 3D coordinates (X_init, Y_init, Z_init).
+</b><pre class="codeinput">X_init=zeros(m,1);
+Y_init=zeros(m,1);
+Z_init=zeros(m,1);
+result=zeros(m,3);
+<span class="keyword">for</span> i=1:m
+    u1=M1(1,1)*x1(i,1)+M1(2,1)*y1(i,1)+M1(3,1)*-focal;
+    v1=M1(1,2)*x1(i,1)+M1(2,2)*y1(i,1)+M1(3,2)*-focal;
+    w1=M1(1,3)*x1(i,1)+M1(2,3)*y1(i,1)+M1(3,3)*-focal;
+    C1=u1/w1; <span class="comment">% C1</span>
+    C2=v1/w1; <span class="comment">% C2</span>
+
+    u2=M2(1,1)*x2(i,1)+M2(2,1)*y2(i,1)+M2(3,1)*-focal;
+    v2=M2(1,2)*x2(i,1)+M2(2,2)*y2(i,1)+M2(3,2)*-focal;
+    w2=M2(1,3)*x2(i,1)+M2(2,3)*y2(i,1)+M2(3,3)*-focal;
+    C3=u2/w2; <span class="comment">% C3</span>
+    C4=v2/w2; <span class="comment">% C4</span>
+    B=[1 0 -C1; 0 1 -C2; 1 0 -C3; 0 1 -C4]; <span class="comment">% B</span>
+    f=[XL1-C1*ZL1;YL1-C2*ZL1;XL2-C3*ZL2;YL2-C4*ZL2;]; <span class="comment">% f</span>
+    W=eye(4,4);
+    N=B'*W*B;
+    t=B'*W*f;
+    del=inv(N)*t;
+    <span class="comment">% initial approximation of X, Y, Z are the elements of del</span>
+    X0=del(1,1);
+    Y0=del(2,1);
+    Z0=del(3,1);
+	</pre><b>For each point in the input data, the code iteratively refines the 3D coordinates using a nonlinear optimization approach (Gauss-Newton method).
+	</br>The loop computes the reprojection errors and updates the 3D coordinates until convergence (the change in the objective function is below a threshold) or a maximum number of iterations is reached.
+    </b><pre class="codeinput">L=[x1(i,1);y1(i,1);x2(i,1);y2(i,1)];
+    L0=L;
+    par_0=[X0;Y0;Z0];
+    keep_going=1;
+    last_phi=10;
+    iter=0;
+    <span class="keyword">while</span> keep_going==1
+       syms <span class="string">xx1</span> <span class="string">yy1</span> <span class="string">xx2</span> <span class="string">yy2</span> <span class="string">X</span> <span class="string">Y</span> <span class="string">Z</span>
+       U1=M1(1,1)*xx1+M1(2,1)*yy1+M1(3,1)*-focal;
+       V1=M1(1,2)*xx1+M1(2,2)*yy1+M1(3,2)*-focal;
+       W1=M1(1,3)*xx1+M1(2,3)*yy1+M1(3,3)*-focal;
+       U2=M2(1,1)*xx2+M2(2,1)*yy2+M2(3,1)*-focal;
+       V2=M2(1,2)*xx2+M2(2,2)*yy2+M2(3,2)*-focal;
+       W2=M2(1,3)*xx2+M2(2,3)*yy2+M2(3,3)*-focal;
+
+       FF=[(X-XL1)-(Z-ZL1)*U1/W1;
+           (Y-YL1)-(Z-ZL1)*V1/W1;
+           (X-XL2)-(Z-ZL2)*U2/W2;
+           (Y-YL2)-(Z-ZL2)*V2/W2];
+       BB=jacobian(FF, [X, Y, Z]); <span class="comment">% BB</span>
+       AA=jacobian(FF, [xx1, yy1, xx2, yy2]); <span class="comment">% AA</span>
+       X=par_0(1,1);
+       Y=par_0(2,1);
+       Z=par_0(3,1);
+       xx1=L0(1,1);
+       yy1=L0(2,1);
+       xx2=L0(3,1);
+       yy2=L0(4,1);
+       F=eval(FF); <span class="comment">% F</span>
+       B=eval(BB); <span class="comment">% B</span>
+       A=eval(AA); <span class="comment">% A</span>
+
+       Q=inv(W);
+       Qe=A*Q*A';
+       We=inv(Qe);
+       f=-F-A*(L-L0); <span class="comment">% f</span>
+       N=B'*We*B; <span class="comment">% N</span>
+       t=B'*We*f; <span class="comment">% t</span>
+       delta=inv(N)*t; <span class="comment">% delta</span>
+       v=inv(We)*f; <span class="comment">% v</span>
+       phi=v'*W*v; <span class="comment">% phi</span>
+
+       obj=abs((last_phi-phi)/last_phi)
+
+       <span class="keyword">if</span> (obj&lt;0.0001)
+          keep_going=0
+          disp(<span class="string">'we have converged'</span>);
+       <span class="keyword">end</span>
+
+       L0=L+v;
+       par_0=par_0+delta;
+
+       <span class="keyword">if</span> (obj&lt;0.0001)
+          result(i,:)=par_0;
+       <span class="keyword">end</span>
+
+       <span class="keyword">if</span> (iter&gt;100)
+          keep_going=0;
+          disp(<span class="string">'too many iterations'</span>);
+       <span class="keyword">end</span>
+       last_phi=phi;
+       iter=iter+1;
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre><b>The final refined 3D coordinates for each point are stored in the result matrix.
+</br>The final results (refined 3D coordinates) are displayed at the end of the code.
+</br>The variable obj represents the change in the objective function (reprojection error) during each iteration.
+</br>The loop terminates when the change in the objective function is below a specified threshold (obj < 0.0001).
+</br>Messages indicating whether the optimization has converged or if there were too many iterations are displayed.
+</b><pre class="codeinput">
+result
+
+</pre><pre class="codeoutput">
+obj =
+   0.999999999989418
+obj =
+   0.134638709505217
+obj =
+     1.373844996570764e-06
+keep_going =
+     0
+<b>we have converged</b>
+
+obj =
+   0.999999999950132
+obj =
+   0.164467893903101
+obj =
+     3.504788708687500e-06
+keep_going =
+     0
+<b>we have converged</b>
+
+obj =
+   0.999999999727284
+obj =
+   0.214652242854700
+obj =
+     1.046073179785581e-05
+keep_going =
+     0
+<b>we have converged</b>
+
+obj =
+   0.999999999590208
+obj =
+   0.082423481245599
+obj =
+     4.708073160023642e-06
+keep_going =
+     0
+<b>we have converged</b>
+
+result =
+
+<span class="comment">% Point 1: X - 0.333158 m  Y - 3.102916 m  Z - 0.0000022 m</span>
+<span class="comment">% Point 2: X - 0.333176 m  Y - 3.102961 m  Z - 0.0000009 m</span>
+<span class="comment">% Point 3: X - 0.333158 m  Y - 3.102953 m  Z - 0.0000040 m</span>
+<span class="comment">% Point 4: X - 0.333176 m  Y - 3.102923 m  Z - 0.0000022 m</span>
+
+</pre><p class="footer">
+</pre><b>The final results are displayed as X, Y, and Z coordinates for each point.</b>
+							</div>
+							<div class="sharebox__module awe-text-center">
+								<p class="social-text">SHARE THIS WORK</p>
+								<a class="social-icon" href="https://www.facebook.com/sharer/sharer.php?u=https://pages.mtu.edu/~amahaur/portfolio/intersection.html"><i class="social-icon__icon fa fa-facebook"></i></a>
+								<a class="social-icon" href="https://twitter.com/intent/tweet?url=https://pages.mtu.edu/~amahaur/portfolio/intersection.html&text="><i class="social-icon__icon fa fa-twitter"></i></a>
+								<a class="social-icon" href="https://www.linkedin.com/shareArticle?mini=true&url=https://pages.mtu.edu/~amahaur/portfolio/intersection.html"><i class="social-icon__icon fa fa-linkedin"></i></a>
+							</div>
+						</div>
+
+						<div class="awe-text-center mt-50">
+							<a class="md-btn md-btn--outline-primary " href="https://pages.mtu.edu/~amahaur/portfolio/">Back to Portfolio</a>&nbsp;&nbsp;
+							<a class="md-btn md-btn--outline-primary " href="https://pages.mtu.edu/~amahaur/">Back to Homepage</a>
+						</div>
+						<div class="awe-text-center mt-50"></div>
+					</div>
+				</section>
+			</div>
+
+			<div class="footer">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-6 col-lg-6 ">
+							<p class="footer__coppy">2018 &copy; Copyright Ashish Mahaur. All rights Reserved.</p>
+						</div>
+						<div class="col-md-6 col-lg-6 ">
+							<div class="footer__social">
+								<a class="social-icon" href="https://twitter.com/AshishMahaur"><i class="social-icon__icon fa fa-twitter"></i></a>
+								<a class="social-icon" href="https://www.linkedin.com/in/ashishmahaur/"><i class="social-icon__icon fa fa-linkedin"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="assets/vendors/jquery/jquery.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/imagesloaded/imagesloaded.pkgd.js"></script>
+		<script type="text/javascript" src="assets/vendors/isotope-layout/isotope.pkgd.js"></script>
+		<script type="text/javascript" src="assets/vendors/jquery-one-page/jquery.nav.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/jquery.easing/jquery.easing.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/jquery.matchHeight/jquery.matchHeight.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/magnific-popup/jquery.magnific-popup.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/masonry-layout/masonry.pkgd.js"></script>
+		<script type="text/javascript" src="assets/vendors/jquery.waypoints/jquery.waypoints.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/swiper/swiper.jquery.js"></script>
+		<script type="text/javascript" src="assets/vendors/menu/menu.js"></script>
+		<script type="text/javascript" src="assets/vendors/typed/typed.min.js"></script>
+		<script type="text/javascript" src="assets/js/main.js"></script>
+	</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Deep Learning algorithms for NASA's GEDI</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<!-- Fonts-->
+		<link rel="stylesheet" type="text/css" href="assets/fonts/fontawesome/font-awesome.min.css">
+		<link rel="stylesheet" type="text/css" href="assets/fonts/pe-icon/pe-icon.css">
+		<!-- Vendors-->
+		<link rel="stylesheet" type="text/css" href="assets/vendors/bootstrap/grid.css">
+		<link rel="stylesheet" type="text/css" href="assets/vendors/magnific-popup/magnific-popup.min.css">
+		<link rel="stylesheet" type="text/css" href="assets/vendors/swiper/swiper.css">
+		<!-- App & fonts-->
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700|Open+Sans:400,700">
+		<link rel="stylesheet" type="text/css" id="app-stylesheet" href="assets/css/main.css"><!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+	
+	<body>
+		<div class="page-wrap" id="root">
+			
+<!-- header -->
+<!-- Adjust the width and height values as needed -->
+<img src="https://pages.mtu.edu/~amahaur/portfolio/assets/img/home.png" alt="Home Icon" style="width: 24px; height: 24px;" />
+
+<!-- header -->
+<header class="header header--fixed">
+    <div class="header__inner">
+        <!-- Remove the home icon from here -->
+		<style>
+			.header__logo {
+			  display: flex;
+			  align-items: center;
+			}
+		  
+			.header__logo a {
+			  color: black;
+			  text-decoration: none;
+			  display: flex;
+			  align-items: center;
+			}
+		  </style>
+		  
+		  <div class="header__logo">
+			  <a href="index.html">
+				  <img src="assets/img/portfolio.png" alt="" style="width: 25px; margin-right: 5px;"/>
+				  Back to Portfolios
+			  </a>
+		  </div>
+		  
+						
+        
+        <!-- Use your custom home icon as an image inside the navbar-toggle -->
+        <div class="navbar-toggle" id="fs-button">
+            <!-- Adjust the width and height values as needed -->
+            <a href="https://pages.mtu.edu/~amahaur/" class="home-icon"><img src="https://pages.mtu.edu/~amahaur/portfolio/assets/img/home.png" alt="Home Icon" style="width: 24px; height: 24px;" /></a>
+        </div>
+    </div>
+</header>
+
+
+
+
+
+
+</header>
+
+				
+			</header><!-- End / header -->
+			
+			<!-- Content-->
+			<div class="wil-content">
+				
+				<!-- Section -->
+				<section class="awe-section">
+					<div class="container">
+						
+						<!-- page-title -->
+						<div class="page-title pb-40">
+							<h2 class="page-title__title">Deep Learning for NASA's GEDI Biomass</h2>
+							<strong>Purpose</strong>: Master's thesis research project</br>
+							<strong>Supervisor</strong>: Dr. Tao Liu</br>
+							<strong>Collaborators</strong>: Dr. Parth Bhatt, Sri Renganath</br>
+							<strong>Duration</strong>: September 2023 - April 2024</br>
+							<strong>Skills</strong>: Machine Learning, Deep Learning, ArcGIS Pro, Python and R programming, Remote Sensing analysis, Research</br>
+							<div class="page-title__divider"></div>
+						</div><!-- End / page-title -->
+						
+					</div>
+				</section>
+				<!-- End / Section -->
+				
+				
+				<!-- Section -->
+				<section class="awe-section bg-gray">
+					<div class="container">
+						
+						<!--  -->
+						<div>
+							<div class="work-detail__entry">
+								<h5>Introduction</h5>
+								<ul>
+
+								  This research project is designed to evaluate the performance of widely used regression models
+									in calculating vegetation features, utilizing Relative Height (RH) and Vegetation Aggregate
+									Biomass as input predictor variables. The datasets used for model fitting are sourced from two
+									distinct projects: NASA's Global Ecosystem Dynamics Investigation (GEDI) and the NSF
+									National Ecological Observatory Network (NEON). These datasets consist of globally
+									distributed, spatially and temporally coincident satellite, and field-based airborne lidar data.
+									The primary focus of the study is to compare the relative height (RH) and ground biomass
+									matrices obtained from actual GEDI observations with ALS-derived simulated benchmarks
+									across the United States. The comparison will be facilitated through cross-evaluation and
+									assessment of mean error as a metric.</br></br>
+									GEDI, a satellite-based full waveform lidar system, is dedicated to providing accurate estimates
+									of forest aboveground biomass density (AGBD). Meanwhile, the National Ecological
+									Observatory Network (NEON), operated by Battelle and funded by the National Science
+									Foundation, serves as a continental-scale observation facility. NEON's mission is to collect
+									long-term, open-access ecological data to enhance our understanding of how U.S. ecosystems
+									are evolving.</br></br>
+									Data from both projects are openly accessible. For this project spatially and temporally
+									coincident Lidar point cloud data was collected.</br></br><i> This project report intends to demonstrate the
+									use of the Python programming language for collection, processing, interpretation, and
+									visualization of the following data to achieve my research goals and objectives.</i>
+								</ul>
+
+								<h5>Methodology</h5>
+								<ul>
+
+									The initial objective involved procuring Discrete Return LiDAR point clouds from the NEON
+									database, focusing on various sites across the United States, each denoted by a unique
+									four-letter sitename such as ABBY, TALL, YELL, etc. The data spans multiple years, ranging
+									from 2014 to 2022, and was collected for two distinct types of sample plots: Distributed and
+									Tower. The distributed plot consisted of a 20 x 20 meter cell whereas the tower plot had four
+									cells of 20 x 20 meter each forming a 40 x 40 meter cell. Two random cells were chosen for
+									each plot therefore giving two 20 x 20 meter cells. Each plot has a 3-digit identification number
+									such as 002, 065 etc.</br></br>
+									To illustrate, a Distributed Plot may be named as follows: <i>"Distributed Plot - ABBY_2017_005".</i>
+									Subsequently, a shapefile (SHP) of the plot and its corresponding Point Cloud (LAS) file were
+									downloaded and organized in a systematic subfolder structure to facilitate subsequent analysis.
+								</ul>
+								<div class="work-img"><img src="assets/img/gedi1.jpg" alt=""></div>
+								<div class="work-img"><img src="assets/img/gedi2.jpg" alt=""></div>
+								<ul>
+									In order to utilize the absolute elevation data from the point cloud it was required to normalize it
+									in order to get elevation with respect to the ground. To do that, I downloaded Digital Terrain
+									Model (DTM) data for each plot from the NEON database. This data would then serve as a reference to get normalized point cloud data (Elevation values with respect to the ground). This
+									process required me to apply Python scripts in order to download, clip, and extract DTM (tiff)
+									corresponding to each plot of 20 x 20 meters.
+								</ul>
+								<div class="work-img"><img src="assets/img/gedi3.jpg" alt=""></div>
+								<ul></br>
+									I first downloaded the DTM data by using NEON API which requires inputs such as SITECODE
+(four-letter word), Product code (DP3.30024.001 - Elevation LiDAR) and create a loop in such a
+way that all site data are downloaded and sorted in the same subfolder structure as my LAS
+files.</br></br>
+The DTM files were then combined to form a complete mosaic of the entire site using the
+following code:
+</ul>
+<div class="work-img"><img src="assets/img/gedi4.jpg" alt=""></div>
+<ul>I utilized the <i>rasterio</i> package to achieve this goal. The OS package was useful for naming the
+	downloaded files and assigning them in subfolders according to site and year.</br></br>
+	The next step was to clip the DTM mosaic files using plot shapefiles and get 20 x 20 meters plot
+	size DTM files for each plot.</ul>
+	<div class="work-img"><img src="assets/img/gedi5.jpg" alt=""></div>
+	<ul>I used a combination of <i>rasterio</i> and <i>geopandas</i> packages to achieve this objective. One unique
+		challenge during the clipping was that the DTM mosaics were associated with one unique
+		coordinate system whereas each plot shapefile had a different coordinate system. In order to
+		clip them with an accurate coordinate system, I added the following line of code:
+	<i>assert gdf.crs == src.crs</i> in order to make sure that coordinate systems are matched before the
+		clipping takes place.</br></br>
+		During the clipping process, I encountered an issue for which I was unable to find the reason for
+		its occurrence. The clipped files were 21 x 21 meters with black null pixels on two borders of
+		each plot. The reason was unknown so I decided to use another line of code to remove the
+		extra black borders and convert it into 20 x 20 meter files.</ul>
+		<div class="work-img"><img src="assets/img/gedi6.jpg" alt=""></div>
+		<ul>
+			Therefore the <i>numpy</i> package was a great tool to extract and remove the black pixels from the
+plot.</br></br>
+The LiDAR point cloud (LAS) files for each plot were normalized using the corresponding DTM
+(tiff) files. These new normalized LAS files were then processed into rGEDI waveform simulator.
+This simulator was initially created for GEDI aa a waveform simulator for calibration of
+algorithms and assessing mission accuracy. But now, virtual GEDI-like observations can be
+derived from airborne laser scanning (ALS) data for given locations using the GEDI simulator.
+The rGEDI simulator produced GEDI-like waveforms with Elevation and Wave amplitude using
+the NEON LiDAR data for each plot. This waveform is necessary to extract Relative Height (RH
+matrices) for further analysis.
+		</ul>
+		<div class="work-img"><img src="assets/img/gedi7.jpg" alt=""></div>
+		<ul></br></br>Total biomass for each plot was also calculated for each plot using the matrices (such as
+			species, tree diameter, etc) provided by the NEON database.</ul>
+
+			<h5>Result and Discussion</h5>
+								<ul>The objective of this project was to collect RH matrices and Biomass for each plot using both
+									GEDI and NEON data. The data has been collected for the Neon sites and my next step is to do
+									the same for GEDI using Python programming. Once this data processing has been completed,
+									this data will serve as an input for regression analysis which includes the Ordinary Least Square
+									(OLS) regression model as well as the Random Forest (RF) regression model. The mean error
+									will be then cross-evaluated to test the performance of both the models.</ul>
+
+<h5>References</h5>
+
+<ul>
+    <li>1. Duncanson, L., Kellner, J. R., Armston, J., Dubayah, R., Minor, D. M., Hancock, S., Healey, S. P., Patterson, P. L., Saarela, S., Marselis, S., Silva, C. E., Bruening, J., Goetz, S. J., Tang, H., Hofton, M., Blair, B., Luthcke, S., Fatoyinbo, L., Abernethy, K., & Alonso, A. (2022). Aboveground biomass density models for NASA’s Global Ecosystem Dynamics Investigation (GEDI) lidar mission. Remote Sensing of Environment, 270, 112845. <a href="https://doi.org/10.1016/j.rse.2021.112845" target="_blank">https://doi.org/10.1016/j.rse.2021.112845</a></li><br>
+
+    <li>2. NEON (National Ecological Observatory Network). Elevation - LiDAR (DP3.30024.001), RELEASE-2023. Dataset accessed from <a href="https://data.neonscience.org/data-products/DP3.30024.001/RELEASE-2023" target="_blank">https://data.neonscience.org/data-products/DP3.30024.001/RELEASE-2023</a> on November 20, 2023.</li><br>
+
+    <li>3. NEON (National Ecological Observatory Network). Discrete return LiDAR point cloud (DP1.30003.001), provisional data. Dataset accessed from <a href="https://data.neonscience.org/data-products/DP1.30003.001" target="_blank">https://data.neonscience.org/data-products/DP1.30003.001</a> on November 20, 2023.</li><br>
+
+    <li>4. NEON Data API Docs. (2023, November 28). GitHub. <a href="https://github.com/NEONScience/neon-data-api" target="_blank">https://github.com/NEONScience/neon-data-api</a></li><br>
+
+    <li>5. Dubayah, R., Luthcke, S., Blair, J., Hofton, M., Armston, J., Tang, H. (2020). <i>GEDI L1B Geolocated Waveform Data Global Footprint Level V001</i> [Data set]. NASA EOSDIS Land Processes Distributed Active Archive Center. Accessed 2023-12-02 from <a href="https://doi.org/10.5067/GEDI/GEDI01_B.001" target="_blank">https://doi.org/10.5067/GEDI/GEDI01_B.001</a></li><br>
+
+    <li>6. Silva,C.A; Hamamura,C.; Valbuena, R.; Hancock,S.; Cardil,A.; Broadbent, E. N.; Almeida,D.R.A.; Silva Junior, C.H.L; Klauberg, C. rGEDI: NASA's Global Ecosystem Dynamics Investigation (GEDI) Data Visualization and Processing. version 0.1.9, accessed on October. 22 2020, available at: <a href="https://CRAN.R-project.org/package=rGEDI" target="_blank">https://CRAN.R-project.org/package=rGEDI</a></li><br>
+
+    <li>7. Huettermann, S., Jones, S., Soto-Berelov, M., & Hislop, S. (2022). Intercomparison of Real and Simulated GEDI Observations across Sclerophyll Forests. Remote Sensing, 14(9), 2096. <a href="https://doi.org/10.3390/rs14092096" target="_blank">https://doi.org/10.3390/rs14092096</a></li><br>
+
+    <li>8. Hancock, S., Armston, J., Hofton, M., Sun, X., Tang, H., Duncanson, L. I., Kellner, J. R., & Dubayah, R. (2019). The GEDI simulator: A large‐footprint waveform lidar simulator for calibration and validation of spaceborne missions. Earth and Space Science. <a href="https://doi.org/10.1029/2018ea000506" target="_blank">https://doi.org/10.1029/2018ea000506</a></li><br>
+</ul>
+<h5>Presentation</h5>
+<ul style="padding: 0; list-style-type: none;">
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #f0f0f0;">
+        <iframe src="https://onedrive.live.com/embed?resid=B80D7BCBC75C5F55%219721&amp;authkey=!AHFylB0oaHaeqAY&amp;em=2&amp;wdAr=1.7777777777777777" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0">
+            This is an embedded <a target="_blank" href="https://office.com">Microsoft Office</a> presentation, powered by 
+            <a target="_blank" href="https://office.com/webapps">Office</a>.
+        </iframe>
+    </div>
+</ul>
+
+
+							</div>
+							<div class="sharebox__module awe-text-center">
+								<p class="social-text">SHARE THIS WORK</p>
+								
+								<!-- social-icon -->
+								<a class="social-icon" href="https://www.facebook.com/sharer/sharer.php?u=https://pages.mtu.edu/~amahaur/portfolio/gedi.html"><i class="social-icon__icon fa fa-facebook"></i>
+								</a><!-- End / social-icon -->
+								
+								
+								<!-- social-icon -->
+								<a class="social-icon" href="https://twitter.com/intent/tweet?url=https://pages.mtu.edu/~amahaur/portfolio/gedi.html&text="><i class="social-icon__icon fa fa-twitter"></i>
+								</a><!-- End / social-icon -->
+								
+								
+								<!-- social-icon -->
+								<a class="social-icon" href="https://www.linkedin.com/shareArticle?mini=true&url=https://pages.mtu.edu/~amahaur/portfolio/gedi.html"><i class="social-icon__icon fa fa-linkedin"></i>
+								</a><!-- End / social-icon -->
+
+								
+							</div>
+						</div><!-- End /  -->
+						
+						<div class="awe-text-center mt-50">
+							<a class="md-btn md-btn--outline-primary " href="https://pages.mtu.edu/~amahaur/portfolio/">Back to Portfolio
+							</a>&nbsp;&nbsp;
+							<a class="md-btn md-btn--outline-primary " href="https://pages.mtu.edu/~amahaur/">Back to Homepage
+							</a>
+						</div>
+						<div class="awe-text-center mt-50">
+
+						</div>
+					</div>
+				</section>
+				<!-- End / Section -->
+				
+			</div>
+			<!-- End / Content-->
+			
+			<!-- footer -->
+			<div class="footer">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-6 col-lg-6 ">
+							<p class="footer__coppy">2018 &copy; Copyright Ashish Mahaur. All rights Reserved.</p>
+						</div>
+						<div class="col-md-6 col-lg-6 ">
+							<div class="footer__social">
+								
+
+								
+								
+								<!-- social-icon -->
+								<a class="social-icon" href="https://twitter.com/AshishMahaur"><i class="social-icon__icon fa fa-twitter"></i>
+								</a><!-- End / social-icon -->
+								
+								
+								<!-- social-icon -->
+								<a class="social-icon" href="https://www.linkedin.com/in/ashishmahaur/"><i class="social-icon__icon fa fa-linkedin"></i>
+								</a><!-- End / social-icon -->
+
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!-- End / footer -->
+			
+		</div>
+		<!-- Vendors-->
+		<script type="text/javascript" src="assets/vendors/jquery/jquery.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/imagesloaded/imagesloaded.pkgd.js"></script>
+		<script type="text/javascript" src="assets/vendors/isotope-layout/isotope.pkgd.js"></script>
+		<script type="text/javascript" src="assets/vendors/jquery-one-page/jquery.nav.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/jquery.easing/jquery.easing.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/jquery.matchHeight/jquery.matchHeight.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/magnific-popup/jquery.magnific-popup.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/masonry-layout/masonry.pkgd.js"></script>
+		<script type="text/javascript" src="assets/vendors/jquery.waypoints/jquery.waypoints.min.js"></script>
+		<script type="text/javascript" src="assets/vendors/swiper/swiper.jquery.js"></script>
+		<script type="text/javascript" src="assets/vendors/menu/menu.js"></script>
+		<script type="text/javascript" src="assets/vendors/typed/typed.min.js"></script>
+		<!-- App-->
+		<script type="text/javascript" src="assets/js/main.js"></script>
+	</body>
+</html>
