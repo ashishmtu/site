@@ -546,14 +546,13 @@
 
   <!-- Initialize Map Script -->
   <script>
-    var map = L.map('map').setView([47.11581869923337, -88.54774843396737], 11.5);
+  var map = L.map('map').setView([26.7073, -80.1755], 12);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
     L.marker([47.11581869923337, -88.54774843396737]).addTo(map)
-      .bindPopup('Michigan Technological University')
+      .bindPopup('Palm Beach County - Fire Rescue')
       .openPopup();
   </script>
 
