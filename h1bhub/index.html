@@ -160,7 +160,7 @@
 
         // --- Configuration ---
         // Updated to use Google Drive direct download links
-        const EXEMPT_CSV_URL = 'https://amahaur.com/h1bhub/exempt_employers.csv'; 
+        const EXEMPT_CSV_URL = 'https://drive.google.com/uc?export=download&id=1GWQz8ay5nWHbESn0OMcD8751ystuYssE'; 
         const HISTORY_CSV_URL = 'https://drive.google.com/uc?export=download&id=1KhNrgPZ7v-9ur3qCrH4C25Sa3JW2MqMf';
 
         const COL_EMPLOYER_NAME_HISTORY = 'employer (petitioner) name';
@@ -199,8 +199,7 @@
             let eDP = false, hDP = false;
 
             try {
-                // Load Exempt Employers CSV
-                console.log("Attempting to load Exempt Employers CSV from Google Drive...");
+                console.log("Attempting to load Exempt Employers CSV from: " + EXEMPT_CSV_URL);
                 const exemptRaw = await loadAndParseCSV(EXEMPT_CSV_URL, 'Exempt Employers CSV');
                 if (exemptRaw) {
                     console.log(`Exempt Employers CSV: Fetched. Raw rows: ${exemptRaw.length}`);
@@ -225,8 +224,7 @@
                     }
                 } 
                 
-                // Load H1B History CSV (single file)
-                console.log("Attempting to load H1B History CSV from Google Drive...");
+                console.log("Attempting to load H1B History CSV from: " + HISTORY_CSV_URL);
                 const historyRaw = await loadAndParseCSV(HISTORY_CSV_URL, 'H1B History CSV');
                 if (historyRaw) {
                     console.log(`H1B History CSV: Fetched. Raw rows: ${historyRaw.length}`);
@@ -268,90 +266,4 @@
         function appendMessage(message, typeClass) { 
             const cardClass = `result-card ${typeClass || ''}`;
             let keyPartOfMessage = message; const pTagEnd = message.indexOf("</p>"); if (pTagEnd > 0) keyPartOfMessage = message.substring(0, pTagEnd);
-            if (!resultsDiv.innerHTML.includes(keyPartOfMessage)) { resultsDiv.innerHTML += `<div class="${cardClass}">${message}</div>`; }
-        }
-        
-        function searchData() { 
-            allMatchingEmployersGrouped = {}; currentPage = 1; 
-            const criticalErrorPresent = resultsDiv.innerHTML.includes("Failed to load") || resultsDiv.innerHTML.includes("No Data Loaded") || resultsDiv.innerHTML.includes("Initialization Error");
-            if ((exemptEmployers.length === 0 && h1bHistoryData.length === 0 && h1bHistoryHeader.length === 0) && !criticalErrorPresent) {
-                initializeData().then(() => { if (exemptEmployers.length > 0 || (h1bHistoryData.length > 0 && h1bHistoryHeader.length > 0) ) { performActualSearchAndDisplayPage(); } else if (!resultsDiv.innerHTML.includes("Error") && !resultsDiv.innerHTML.includes("Issue")) { appendMessage("<h3>Data Not Ready</h3><p>Essential data not available for search. Please check initialization messages.</p>", "status-error");} });
-            } else if (!criticalErrorPresent) { performActualSearchAndDisplayPage(); 
-            } else { if(!resultsDiv.innerHTML.includes("Search Blocked")){ appendMessage("<h3>Search Blocked</h3><p>Cannot perform search as critical data files failed to load. Please check earlier messages.</p>", "status-error");} }
-        }
-
-        function performActualSearchAndDisplayPage() { 
-            resultsDiv.innerHTML = ''; paginationControlsDiv.innerHTML = '';
-            const eNT = employerNameInput.value.trim().toUpperCase(); const cT = cityInput.value.trim().toUpperCase(); const sT = stateInput.value.trim().toUpperCase(); const zT = zipInput.value.trim().toUpperCase();
-            if (!eNT && !cT && !sT && !zT) { resultsDiv.innerHTML = `<div class="result-card status-not-found"><h3>No Input</h3><p>Please enter at least one search criterion.</p></div>`; return; }
-            let sCDP = []; if (eNT) sCDP.push(`Employer: "${employerNameInput.value.trim()}"`); if (cT) sCDP.push(`City: "${cityInput.value.trim()}"`); if (sT) sCDP.push(`State: "${stateInput.value.trim()}"`); if (zT) sCDP.push(`Zip: "${zipInput.value.trim()}"`); const cTJoined = sCDP.join(', ');
-            let dEH = ""; let dEMF = false; if (eNT && exemptEmployers.includes(eNT)) { dEH = `<div class="result-card status-exempt"><h3>${employerNameInput.value.trim()}</h3><p class="employer-status-message">Status: H1B Exempt Employer</p></div>`; dEMF = true; }
-            if (!h1bHistoryHeader || h1bHistoryHeader.length === 0) { resultsDiv.innerHTML = `<h2>Results for ${cTJoined}</h2>` + dEH; if (!dEMF) { appendMessage("<h3>H1B History Data Not Available</h3><p>Cannot search H1B history as its data or headers are missing.</p>", "status-error"); } return; }
-            const eNI = h1bHistoryHeader.indexOf(COL_EMPLOYER_NAME_HISTORY); const fYI = h1bHistoryHeader.indexOf(COL_FISCAL_YEAR); const cI = h1bHistoryHeader.indexOf(COL_CITY); const sI = h1bHistoryHeader.indexOf(COL_STATE); const zI = h1bHistoryHeader.indexOf(COL_ZIP);
-            if (eNI === -1 || fYI === -1 ) { resultsDiv.innerHTML = `<h2>Results for ${cTJoined}</h2>` + dEH; if (!resultsDiv.innerHTML.includes("Configuration Issue")) { appendMessage("<h3>Configuration Issue in History CSV</h3><p>Essential columns (Employer Name, Fiscal Year) missing in H1B History data.</p>", "status-error"); } return; }
-            const mR = h1bHistoryData.filter(r => { let mX = eNI; if (cI !== -1) mX = Math.max(mX, cI); if (sI !== -1) mX = Math.max(mX, sI); if (zI !== -1) mX = Math.max(mX, zI); if (!r || r.length <= mX ) return false; let cM = true; if (eNT) { cM = cM && (r[eNI] || '').toUpperCase().includes(eNT); } if (cT) { cM = cM && (cI !== -1 && (r[cI] || '').toUpperCase().includes(cT)); } if (sT) { cM = cM && (sI !== -1 && (r[sI] || '').toUpperCase().includes(sT)); } if (zT) { cM = cM && (zI !== -1 && (r[zI] || '').toUpperCase().includes(zT)); } return cM; });
-            if (mR.length > 0) { allMatchingEmployersGrouped = mR.reduce((acc, record) => { const empNameKey = record[eNI] || "Unknown Employer"; if (!acc[empNameKey]) { acc[empNameKey] = []; } acc[empNameKey].push(record); return acc; }, {}); } else { allMatchingEmployersGrouped = {}; }
-            displayPage(cTJoined, dEH, dEMF); 
-        }
-
-        function displayPage(criteriaText, directExemptHTML, directExemptMatchFound) { 
-            resultsDiv.innerHTML = ""; paginationControlsDiv.innerHTML = ''; 
-            const employerKeys = Object.keys(allMatchingEmployersGrouped); let foundHistoryResults = employerKeys.length > 0; let pageTitleDisplayed = false;
-            if (directExemptMatchFound) { resultsDiv.innerHTML += directExemptHTML; }
-            if (foundHistoryResults) {
-                if (directExemptMatchFound) { resultsDiv.innerHTML += `<hr style="margin: 20px 0;"><h2>H1B History Results for ${criteriaText}</h2>`; } 
-                else { resultsDiv.innerHTML = `<h2>Results for ${criteriaText} (H1B History)</h2>`; }
-                pageTitleDisplayed = true; const startIndex = (currentPage - 1) * RESULTS_PER_PAGE; const endIndex = startIndex + RESULTS_PER_PAGE; const paginatedEmployerKeys = employerKeys.slice(startIndex, endIndex);
-                if (paginatedEmployerKeys.length === 0 && currentPage > 1) { currentPage--; displayPage(criteriaText, directExemptHTML, directExemptMatchFound); return; }
-                paginatedEmployerKeys.forEach(employerName => {
-                    const recordsForEmployer = allMatchingEmployersGrouped[employerName]; const firstRecordForEmployer = recordsForEmployer[0]; 
-                    const isExempt = exemptEmployers.includes(employerName.toUpperCase()); const statusMessage = isExempt ? "Status: H1B Exempt Employer" : "Status: H1B Sponsor Company"; const cardClass = isExempt ? "status-exempt" : "status-sponsors";
-                    let primaryLocationParts = []; const cityIdx = h1bHistoryHeader.indexOf(COL_CITY); const stateIdx = h1bHistoryHeader.indexOf(COL_STATE); const zipIdx = h1bHistoryHeader.indexOf(COL_ZIP); 
-                    if (cityIdx !== -1 && firstRecordForEmployer[cityIdx]) primaryLocationParts.push(firstRecordForEmployer[cityIdx]); if (stateIdx !== -1 && firstRecordForEmployer[stateIdx]) primaryLocationParts.push(firstRecordForEmployer[stateIdx]); if (zipIdx !== -1 && firstRecordForEmployer[zipIdx]) primaryLocationParts.push(firstRecordForEmployer[zipIdx]); const primaryLocationString = primaryLocationParts.filter(Boolean).join(', ');
-                    let employerHTML = `<div class="result-card ${cardClass}"><h3>${employerName}</h3>`; if (primaryLocationString) { employerHTML += `<p class="employer-main-location">${primaryLocationString}</p>`; } employerHTML += `<p class="employer-status-message">${statusMessage}</p>`;
-                    let yearlyDetails = []; const fiscalYearIdx = h1bHistoryHeader.indexOf(COL_FISCAL_YEAR); 
-                    recordsForEmployer.forEach(record => { yearlyDetails.push({ year: record[fiscalYearIdx] || 'N/A', city: cityIdx !== -1 ? (record[cityIdx] || '') : '', state: stateIdx !== -1 ? (record[stateIdx] || '') : '', zip: zipIdx !== -1 ? (record[zipIdx] || '') : '' }); });
-                    const uniqueYearEntries = Array.from(new Map(yearlyDetails.map(item => [item.year + item.city + item.state + item.zip, item])).values()).sort((a, b) => (b.year).localeCompare(a.year) || (a.city+a.state+a.zip).localeCompare(b.city+b.state+b.zip));
-                    if (uniqueYearEntries.length > 0) { employerHTML += `<div class="year-details"><h4>Fiscal Year Activity:</h4>`; uniqueYearEntries.forEach(entry => { let lS = [entry.city, entry.state, entry.zip].filter(Boolean).join(', '); employerHTML += `<div class="year-entry"><p><strong>Fiscal Year: ${entry.year}</strong>${lS ? `<span class="location-info"> (Location: ${lS})</span>` : ''}</p></div>`; }); employerHTML += `</div>`; }
-                    employerHTML += `</div>`; appendMessage(employerHTML, ''); 
-                });
-                renderPaginationControls(employerKeys.length, criteriaText, directExemptHTML, directExemptMatchFound);
-            }
-            if (!directExemptMatchFound && !foundHistoryResults) { if (!pageTitleDisplayed) { resultsDiv.innerHTML = `<h2>Results for ${criteriaText}</h2>`; } appendMessage(`<div class="result-card status-not-found"><h3><span style="color:#a71d2a;">✘</span> Not Found</h3><p>No information found matching your criteria.</p></div>`, "");
-            } else if (directExemptMatchFound && !foundHistoryResults && resultsDiv.innerHTML.includes("H1B Exempt Employer") && !resultsDiv.innerHTML.includes("result-card status-sponsors")) { /* Only exempt shown */ }
-        }
-
-        function renderPaginationControls(totalResults, criteriaText, directExemptHTML, directExemptMatchFound) { 
-            paginationControlsDiv.innerHTML = ''; const totalPages = Math.ceil(totalResults / RESULTS_PER_PAGE); if (totalPages <= 1) return; 
-            let paginationHTML = ''; const directExemptHTMLArg = directExemptHTML.replace(/"/g, '&quot;').replace(/'/g, '\\\''); const criteriaTextArg = criteriaText.replace(/"/g, '&quot;').replace(/'/g, '\\\'');
-            if (currentPage > 1) { paginationHTML += `<button class="pagination-button" onclick="changePage(${currentPage - 1}, '${criteriaTextArg}', '${directExemptHTMLArg}', ${directExemptMatchFound})">Previous</button>`; } else { paginationHTML += `<button class="pagination-button" disabled>Previous</button>`; }
-            paginationHTML += `<span>Page ${currentPage} of ${totalPages}</span>`;
-            if (currentPage < totalPages) { paginationHTML += `<button class="pagination-button" onclick="changePage(${currentPage + 1}, '${criteriaTextArg}', '${directExemptHTMLArg}', ${directExemptMatchFound})">Next</button>`; } else { paginationHTML += `<button class="pagination-button" disabled>Next</button>`; }
-            paginationControlsDiv.innerHTML = paginationHTML;
-        }
-        function changePage(newPage, criteriaText, directExemptHTML, directExemptMatchFound) { 
-            currentPage = newPage; const unescapedCriteriaText = criteriaText.replace(/&quot;/g, '"').replace(/\\'/g, "'"); const unescapedDirectExemptHTML = directExemptHTML.replace(/&quot;/g, '"').replace(/\\'/g, "'");
-            displayPage(unescapedCriteriaText, unescapedDirectExemptHTML, directExemptMatchFound);
-            const resultsElement = document.getElementById('results'); if (resultsElement) { resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-        }
-        window.onload = initializeData;
-    </script>
-</body>
-</html>
-```
-
-The `EXEMPT_CSV_URL` and `HISTORY_CSV_URL` constants have been updated to the direct download Google Drive links.
-
-**Important Considerations:**
-
-* **File Permissions on Google Drive:** Ensure that both files on Google Drive are shared with "Anyone with the link can view" permissions. Otherwise, the `fetch` requests will be blocked.
-* **CORS:** As mentioned, fetching directly from Google Drive relies on Google sending the correct CORS headers. If you encounter "CORS error" or "Cross-Origin Request Blocked" messages in your browser's developer console, this is the likely culprit. There's not much you can do in the client-side code to fix this if Google Drive doesn't allow the request. The most robust solution in that case would be to host the CSV files on the same domain as your `index.html` (like your `drv.tw` hosting, if it allows for larger files or if you can use the split-file approach again with files hosted there).
-* **Performance with Large Files:** Even with direct download links, fetching and parsing a very large CSV file (like your original 35MB history file) entirely in the browser can still be slow and memory-intensive for the user. The split-file approach was designed to mitigate this. If the single `h1b_history.csv` from Google Drive is still very large, users might experience delays.
-
-**To test:**
-1.  Replace your `index.html` with the code above.
-2.  Ensure your Google Drive files are shared correctly.
-3.  Open your `index.html` (preferably served via a local server for consistent testing, or from your `drv.tw` link).
-4.  **Open the Developer Console (F12)** to watch for any `fetch` errors or CORS issues.
-
-This change directly addresses your request to use the Google Drive links. Let me know how it wor
+            if (!resultsDiv.innerHTML.includes(keyPartOfMessage)) { results
