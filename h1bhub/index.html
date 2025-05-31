@@ -44,7 +44,7 @@
             color: #555;
         }
         .search-form input[type="text"] {
-            width: calc(100% - 30px); 
+            width: calc(100% - 30px); /* Account for padding */
             padding: 10px 15px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
@@ -86,12 +86,16 @@
         }
         .result-card h3 { margin-top: 0; margin-bottom: 5px; font-size: 1.3em; }
         .employer-main-location {
-            font-size: 0.9em; font-style: italic;
-            color: #555; margin-bottom: 8px;
+            font-size: 0.9em;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 8px;
         }
         .employer-status-message {
-            font-weight: bold; margin-top: 0px;
-            margin-bottom: 12px; font-size: 1em;
+            font-weight: bold;
+            margin-top: 0px;
+            margin-bottom: 12px;
+            font-size: 1em;
         }
         .status-exempt { border-left-color: #28a745; background-color: #e9f7ef; }
         .status-exempt .employer-status-message { color: #1e7e34; }
@@ -154,17 +158,17 @@
         let currentPage = 1;
         const RESULTS_PER_PAGE = 20;
 
-        const EXEMPT_CSV_URL = 'exempt_employers.csv'; 
-        const HISTORY_CSV_PART_URLS = [
-            'h1b_history_part1.csv', 'h1b_history_part2.csv',
-            'h1b_history_part3.csv', 'h1b_history_part4.csv'
-        ];   
+        // --- Configuration ---
+        // Updated to use Google Drive direct download links
+        const EXEMPT_CSV_URL = 'https://drive.google.com/uc?export=download&id=1GWQz8ay5nWHbESn0OMcD8751ystuYssE'; 
+        const HISTORY_CSV_URL = 'https://drive.google.com/uc?export=download&id=1KhNrgPZ7v-9ur3qCrH4C25Sa3JW2MqMf';
 
         const COL_EMPLOYER_NAME_HISTORY = 'employer (petitioner) name';
         const COL_FISCAL_YEAR = 'fiscal year';
         const COL_CITY = 'petitioner city';
         const COL_STATE = 'petitioner state';
         const COL_ZIP = 'petitioner zip code';
+        // --- End Configuration ---
 
         const loader = document.getElementById('loader');
         const loadingMessage = document.getElementById('loadingMessage');
@@ -190,12 +194,13 @@
             loadingMessage.style.display = 'block';
             resultsDiv.innerHTML = ''; 
             paginationControlsDiv.innerHTML = '';
-            console.log("INITIALIZING DATA (Multi-part history)..."); 
+            console.log("INITIALIZING DATA (Single history file from Google Drive)..."); 
 
-            let eDP = false, hDP = false; // Flags for processed data successfully
+            let eDP = false, hDP = false;
 
             try {
                 // Load Exempt Employers CSV
+                console.log("Attempting to load Exempt Employers CSV from Google Drive...");
                 const exemptRaw = await loadAndParseCSV(EXEMPT_CSV_URL, 'Exempt Employers CSV');
                 if (exemptRaw) {
                     console.log(`Exempt Employers CSV: Fetched. Raw rows: ${exemptRaw.length}`);
@@ -214,73 +219,37 @@
                         eDP = true;
                         console.log(`Exempt Employers CSV: Processed. Found ${exemptEmployers.length} exempt employers.`);
                     } else if (exemptRaw.length > 0) { 
-                        appendMessage("<h3>Data Issue</h3><p>Exempt employers CSV loaded, but no valid employer names found.</p>", "status-error");
+                        appendMessage("<h3>Data Issue</h3><p>Exempt employers CSV: no valid employer names found.</p>", "status-error");
                     } else { 
-                         appendMessage("<h3>Data Issue</h3><p>Exempt employers CSV loaded but was empty or had no processable rows.</p>", "status-error");
+                         appendMessage("<h3>Data Issue</h3><p>Exempt employers CSV: loaded but was empty.</p>", "status-error");
                     }
                 } 
-                // Error for exemptRaw being null is handled by loadAndParseCSV itself appending a message
+                
+                // Load H1B History CSV (single file)
+                console.log("Attempting to load H1B History CSV from Google Drive...");
+                const historyRaw = await loadAndParseCSV(HISTORY_CSV_URL, 'H1B History CSV');
+                if (historyRaw) {
+                    console.log(`H1B History CSV: Fetched. Raw rows: ${historyRaw.length}`);
+                    if (historyRaw.length > 1 && historyRaw[0].some(h => typeof h === 'string' && h.trim() !== '')) {
+                        h1bHistoryHeader = historyRaw[0].map(h => (h || '').toString().toLowerCase().trim());
+                        h1bHistoryData = historyRaw.slice(1);
+                        console.log("H1B History CSV: Header processed:", h1bHistoryHeader);
 
-                // Load H1B History CSV Parts
-                console.log("Attempting to load H1B History CSV parts...");
-                const historyPartPromises = HISTORY_CSV_PART_URLS.map((url, index) => 
-                    loadAndParseCSV(url, `H1B History CSV Part ${index + 1}`)
-                        // Let loadAndParseCSV handle its own error messages.
-                        // Promise.all will get null for failed parts if loadAndParseCSV returns null.
-                );
-
-                const allHistoryPartsRaw = await Promise.all(historyPartPromises);
-
-                let combinedHistoryData = [];
-                let firstHeaderProcessed = false;
-                let partsSuccessfullyLoadedCount = 0;
-
-                allHistoryPartsRaw.forEach((historyPartRaw, index) => {
-                    if (historyPartRaw) { // Check if the part was loaded successfully (not null)
-                        partsSuccessfullyLoadedCount++;
-                        console.log(`H1B History CSV Part ${index + 1}: Successfully parsed. Raw rows: ${historyPartRaw.length}`);
-                        if (historyPartRaw.length > 0) {
-                            if (!firstHeaderProcessed) {
-                                if (historyPartRaw[0].some(h => typeof h === 'string' && h.trim() !== '')) {
-                                    h1bHistoryHeader = historyPartRaw[0].map(h => (h || '').toString().toLowerCase().trim());
-                                    console.log(`H1B History CSV: Header processed from Part ${index + 1}:`, h1bHistoryHeader);
-                                    if (historyPartRaw.length > 1) { 
-                                        combinedHistoryData.push(...historyPartRaw.slice(1));
-                                    }
-                                    firstHeaderProcessed = true;
-                                } else {
-                                    console.warn(`H1B History CSV Part ${index + 1}: Has rows but no valid header. Cannot use as main header.`);
-                                    appendMessage(`<h3>Data Issue</h3><p>H1B History CSV Part ${index + 1} has rows but no valid header.</p>`, "status-error");
-                                }
-                            } else { 
-                                if (historyPartRaw.length > 1) {
-                                    combinedHistoryData.push(...historyPartRaw.slice(1));
-                                } else if (historyPartRaw.length === 1){ 
-                                     console.log(`H1B History CSV Part ${index + 1}: Contained only a header row.`);
-                                }
-                            }
-                        } else {
-                            console.warn(`H1B History CSV Part ${index + 1}: Loaded but was empty after filtering.`);
+                        if (h1bHistoryData.length > 0) {
+                            hDP = true;
+                            console.log(`H1B History CSV: Processed. Found ${h1bHistoryData.length} data records.`);
+                        } else { 
+                             appendMessage("<h3>Data Issue</h3><p>H1B history CSV: header found, but no data rows.</p>", "status-error");
                         }
-                    } 
-                });
-
-                if (firstHeaderProcessed && combinedHistoryData.length > 0) {
-                    h1bHistoryData = combinedHistoryData;
-                    hDP = true;
-                    console.log(`H1B History CSV: All parts combined. Total data records: ${h1bHistoryData.length}`);
-                } else if (partsSuccessfullyLoadedCount > 0 && !firstHeaderProcessed) { 
-                    appendMessage("<h3>Data Issue</h3><p>H1B history CSV parts loaded, but a common header could not be established.</p>", "status-error");
-                } else if (partsSuccessfullyLoadedCount === 0 && HISTORY_CSV_PART_URLS.length > 0) {
-                    // Errors for individual parts already shown by loadAndParseCSV
-                    if (!resultsDiv.innerHTML.includes("H1B History CSV")) { // Fallback generic
-                        appendMessage("<h3>Error Loading Data</h3><p>Failed to load any H1B History CSV parts.</p>", "status-error");
+                    } else if (historyRaw.length > 0) { 
+                        appendMessage("<h3>Data Issue</h3><p>H1B history CSV: missing data rows or a valid header.</p>", "status-error");
+                    } else { 
+                        appendMessage("<h3>Data Issue</h3><p>H1B history CSV: loaded but was empty.</p>", "status-error");
                     }
                 }
 
-
-            } catch (error) { // Catch any overarching error during the Promise.all or other await calls
-                console.error("Error during initializeData:", error);
+            } catch (error) { 
+                console.error("Critical error during initializeData:", error);
                 appendMessage("<h3>Initialization Error</h3><p>A critical error occurred during data loading. Please check the console.</p>", "status-error");
             } finally {
                 loader.style.display = 'none';
@@ -289,8 +258,8 @@
                 if (eDP || hDP) {
                      console.log("Data initialization sequence complete. Exempt data ready: " + eDP + ", History data ready: " + hDP);
                 } else {
-                    if (!resultsDiv.innerHTML.includes("Error Loading Data") && !resultsDiv.innerHTML.includes("Data Issue") && !resultsDiv.innerHTML.includes("No Data Loaded")) {
-                        appendMessage("<h3>No Data Loaded</h3><p>Neither exempt nor H1B history data could be successfully processed. The application may not function correctly.</p>", "status-error");
+                    if (!resultsDiv.innerHTML.includes("Error Loading Data") && !resultsDiv.innerHTML.includes("Data Issue") && !resultsDiv.innerHTML.includes("No Data Loaded") && !resultsDiv.innerHTML.includes("Initialization Error")) {
+                        appendMessage("<h3>No Data Loaded</h3><p>Neither data file could be successfully processed. The application may not function correctly.</p>", "status-error");
                     }
                 }
             }
@@ -299,16 +268,10 @@
         function appendMessage(message, typeClass) { 
             const cardClass = `result-card ${typeClass || ''}`;
             let keyPartOfMessage = message; const pTagEnd = message.indexOf("</p>"); if (pTagEnd > 0) keyPartOfMessage = message.substring(0, pTagEnd);
-            // Avoid appending the exact same full message card again
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<div class="${cardClass}">${message}</div>`;
-            const newMessageCardHTML = tempDiv.innerHTML;
-            if (!resultsDiv.innerHTML.includes(newMessageCardHTML)) { 
-                resultsDiv.innerHTML += newMessageCardHTML; 
-            }
+            if (!resultsDiv.innerHTML.includes(keyPartOfMessage)) { resultsDiv.innerHTML += `<div class="${cardClass}">${message}</div>`; }
         }
         
-        function searchData() { /* ... same as before ... */
+        function searchData() { 
             allMatchingEmployersGrouped = {}; currentPage = 1; 
             const criticalErrorPresent = resultsDiv.innerHTML.includes("Failed to load") || resultsDiv.innerHTML.includes("No Data Loaded") || resultsDiv.innerHTML.includes("Initialization Error");
             if ((exemptEmployers.length === 0 && h1bHistoryData.length === 0 && h1bHistoryHeader.length === 0) && !criticalErrorPresent) {
@@ -317,7 +280,7 @@
             } else { if(!resultsDiv.innerHTML.includes("Search Blocked")){ appendMessage("<h3>Search Blocked</h3><p>Cannot perform search as critical data files failed to load. Please check earlier messages.</p>", "status-error");} }
         }
 
-        function performActualSearchAndDisplayPage() { /* ... same as previous version, including DOM element gets and event listener ... */
+        function performActualSearchAndDisplayPage() { 
             resultsDiv.innerHTML = ''; paginationControlsDiv.innerHTML = '';
             const eNT = employerNameInput.value.trim().toUpperCase(); const cT = cityInput.value.trim().toUpperCase(); const sT = stateInput.value.trim().toUpperCase(); const zT = zipInput.value.trim().toUpperCase();
             if (!eNT && !cT && !sT && !zT) { resultsDiv.innerHTML = `<div class="result-card status-not-found"><h3>No Input</h3><p>Please enter at least one search criterion.</p></div>`; return; }
@@ -331,7 +294,7 @@
             displayPage(cTJoined, dEH, dEMF); 
         }
 
-        function displayPage(criteriaText, directExemptHTML, directExemptMatchFound) { /* ... same as previous version ... */
+        function displayPage(criteriaText, directExemptHTML, directExemptMatchFound) { 
             resultsDiv.innerHTML = ""; paginationControlsDiv.innerHTML = ''; 
             const employerKeys = Object.keys(allMatchingEmployersGrouped); let foundHistoryResults = employerKeys.length > 0; let pageTitleDisplayed = false;
             if (directExemptMatchFound) { resultsDiv.innerHTML += directExemptHTML; }
@@ -358,7 +321,7 @@
             } else if (directExemptMatchFound && !foundHistoryResults && resultsDiv.innerHTML.includes("H1B Exempt Employer") && !resultsDiv.innerHTML.includes("result-card status-sponsors")) { /* Only exempt shown */ }
         }
 
-        function renderPaginationControls(totalResults, criteriaText, directExemptHTML, directExemptMatchFound) { /* ... same as before ... */
+        function renderPaginationControls(totalResults, criteriaText, directExemptHTML, directExemptMatchFound) { 
             paginationControlsDiv.innerHTML = ''; const totalPages = Math.ceil(totalResults / RESULTS_PER_PAGE); if (totalPages <= 1) return; 
             let paginationHTML = ''; const directExemptHTMLArg = directExemptHTML.replace(/"/g, '&quot;').replace(/'/g, '\\\''); const criteriaTextArg = criteriaText.replace(/"/g, '&quot;').replace(/'/g, '\\\'');
             if (currentPage > 1) { paginationHTML += `<button class="pagination-button" onclick="changePage(${currentPage - 1}, '${criteriaTextArg}', '${directExemptHTMLArg}', ${directExemptMatchFound})">Previous</button>`; } else { paginationHTML += `<button class="pagination-button" disabled>Previous</button>`; }
@@ -366,7 +329,7 @@
             if (currentPage < totalPages) { paginationHTML += `<button class="pagination-button" onclick="changePage(${currentPage + 1}, '${criteriaTextArg}', '${directExemptHTMLArg}', ${directExemptMatchFound})">Next</button>`; } else { paginationHTML += `<button class="pagination-button" disabled>Next</button>`; }
             paginationControlsDiv.innerHTML = paginationHTML;
         }
-        function changePage(newPage, criteriaText, directExemptHTML, directExemptMatchFound) { /* ... same as before ... */
+        function changePage(newPage, criteriaText, directExemptHTML, directExemptMatchFound) { 
             currentPage = newPage; const unescapedCriteriaText = criteriaText.replace(/&quot;/g, '"').replace(/\\'/g, "'"); const unescapedDirectExemptHTML = directExemptHTML.replace(/&quot;/g, '"').replace(/\\'/g, "'");
             displayPage(unescapedCriteriaText, unescapedDirectExemptHTML, directExemptMatchFound);
             const resultsElement = document.getElementById('results'); if (resultsElement) { resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
@@ -375,3 +338,20 @@
     </script>
 </body>
 </html>
+```
+
+The `EXEMPT_CSV_URL` and `HISTORY_CSV_URL` constants have been updated to the direct download Google Drive links.
+
+**Important Considerations:**
+
+* **File Permissions on Google Drive:** Ensure that both files on Google Drive are shared with "Anyone with the link can view" permissions. Otherwise, the `fetch` requests will be blocked.
+* **CORS:** As mentioned, fetching directly from Google Drive relies on Google sending the correct CORS headers. If you encounter "CORS error" or "Cross-Origin Request Blocked" messages in your browser's developer console, this is the likely culprit. There's not much you can do in the client-side code to fix this if Google Drive doesn't allow the request. The most robust solution in that case would be to host the CSV files on the same domain as your `index.html` (like your `drv.tw` hosting, if it allows for larger files or if you can use the split-file approach again with files hosted there).
+* **Performance with Large Files:** Even with direct download links, fetching and parsing a very large CSV file (like your original 35MB history file) entirely in the browser can still be slow and memory-intensive for the user. The split-file approach was designed to mitigate this. If the single `h1b_history.csv` from Google Drive is still very large, users might experience delays.
+
+**To test:**
+1.  Replace your `index.html` with the code above.
+2.  Ensure your Google Drive files are shared correctly.
+3.  Open your `index.html` (preferably served via a local server for consistent testing, or from your `drv.tw` link).
+4.  **Open the Developer Console (F12)** to watch for any `fetch` errors or CORS issues.
+
+This change directly addresses your request to use the Google Drive links. Let me know how it wor
