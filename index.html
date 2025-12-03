@@ -524,16 +524,21 @@
   </div>
 
   <!-- Initialize Map Script -->
-  <script>
-  var map = L.map('map').setView([26.7073, -80.1755], 12);
+<script>
+  // 1. Center the map on West Palm Beach
+  // I updated this slightly to center better on the Fire Rescue HQ area
+  var map = L.map('map').setView([26.6826, -80.1472], 13); 
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
-    L.marker([47.11581869923337, -88.54774843396737]).addTo(map)
+
+    // 2. Place the marker at the Fire Rescue HQ coordinates
+    // previously this was set to coordinates in Michigan
+    L.marker([26.6826, -80.1472]).addTo(map) 
       .bindPopup('Palm Beach County - Fire Rescue')
       .openPopup();
-  </script>
+ </script>
 
 </section><!-- End Contact Section -->
 
